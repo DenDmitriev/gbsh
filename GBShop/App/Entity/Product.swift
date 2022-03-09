@@ -1,24 +1,16 @@
 //
-//  Catalog.swift
+//  Product.swift
 //  GBShop
 //
-//  Created by Denis Dmitriev on 23.02.2022.
+//  Created by Denis Dmitriev on 09.03.2022.
 //
 
 import Foundation
 
 struct Product: Codable {
-    let result: Int
-    let name: String
-    let price: Int
-    let description: String
-
-    enum CodingKeys: String, CodingKey {
-        case result = "result"
-        case name = "product_name"
-        case price = "product_price"
-        case description = "product_description"
-    }
+    var id: Int
+    var category: Int
+    var name: String
+    var price: Int
+    var description: String
 }
-
-

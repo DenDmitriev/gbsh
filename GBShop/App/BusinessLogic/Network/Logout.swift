@@ -12,7 +12,7 @@ class Logout: AbstractRequestFactory {
     let errorParser: AbstractErrorParser
     let sessionManager: Session
     let queue: DispatchQueue
-    let baseUrl = URL(string: "https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses/")!
+    let baseUrl = URL(string: "https://lit-atoll-22091.herokuapp.com/")!
     
     init(
         errorParser: AbstractErrorParser,
@@ -27,6 +27,7 @@ class Logout: AbstractRequestFactory {
 extension Logout: LogoutRequestFactory {
     func logout(userId: Int, completionHandler: @escaping (AFDataResponse<LogoutResult>) -> Void) {
         let requestModel = Logout(baseUrl: baseUrl, userId: userId)
+        print(requestModel.fullUrl)
         self.request(request: requestModel, completionHandler: completionHandler)
     }
 }
@@ -34,8 +35,8 @@ extension Logout: LogoutRequestFactory {
 extension Logout {
     struct Logout: RequestRouter {
         let baseUrl: URL
-        let method: HTTPMethod = .get
-        let path: String = "logout.json"
+        let method: HTTPMethod = .post
+        let path: String = "logout"
         
         let userId: Int
         var parameters: Parameters? {

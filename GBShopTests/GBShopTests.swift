@@ -25,7 +25,7 @@ class GBShopTests: XCTestCase {
     }
     
     func testAuth() throws {
-        let auth = requestFactory.makeAuthRequestFatory()
+        let auth = requestFactory.makeAuthRequestFactory()
         
         auth.login(userName: "Somebody", password: "mypassword") { response in
             switch response.result {
@@ -43,8 +43,7 @@ class GBShopTests: XCTestCase {
     func testRegister() throws {
         let register = requestFactory.makeRegisterRequestFactory()
         register.register(
-            userId: 123,
-            userName: "Somebody",
+            username: "Somebody",
             password: "mypassword",
             email: "some@some.ru",
             gender: "m",
@@ -66,15 +65,7 @@ class GBShopTests: XCTestCase {
     func testChangeUserData() throws {
         let change = requestFactory.makeChangeUserDataRequestFactory()
         
-        change.change(
-            userId: 123,
-            userName: "Geekbrains",
-            password: "password",
-            email: "geekbrains@gb.ru",
-            gender: "m",
-            creditCard: "9872389-2424-234224-234",
-            bio: "This is good! I think I will switch to another language"
-        ) { response in
+        change.change(userId: 2, username: "Geekbrains", password: "password", email: "geekbrains@gb.ru", gender: "m", creditCard: "9872389-2424-234224-234", bio: "This is good! I think I will switch to another language") { response in
             switch response.result {
             case .success(let change):
                 print(change)

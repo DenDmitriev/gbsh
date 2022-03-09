@@ -14,64 +14,85 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        authRequest()
-        registerRequest()
-        changeUserDataRequest()
-        logoutRequest()
-        getCatalog { products in
-            print(products)
+        authRequest { result in
+            switch result {
+            case .success(let user):
+                print(user)
+            case .failure(let error):
+                print(error)
+            }
         }
-        getProduct(by: 123) { product in
-            print(product)
+        registerRequest { result in
+            switch result {
+            case .success(let message):
+                print(message)
+            case .failure(let error):
+                print(error)
+            }
+        }
+        changeUserDataRequest { result in
+            switch result {
+            case .success(let message):
+                print(message)
+            case .failure(let error):
+                print(error)
+            }
+        }
+        logoutRequest()
+        getCatalog { result in
+            switch result {
+            case .success(let products):
+                print(products)
+            case .failure(let error):
+                print(error)
+            }
+        }
+        getProduct(by: 123) { result in
+            switch result {
+            case .success(let product):
+                print(product)
+            case .failure(let error):
+                print(error)
+            }
         }
     }
     
-    func authRequest() {
-        let auth = requestFactory.makeAuthRequestFatory()
-        auth.login(userName: "Somebody", password: "mypassword") { response in
+    
+    
+    func authRequest(completion: @escaping ((Result<User, NetworkError>) -> Void)) {
+        let request = requestFactory.makeRequestFactory()
+        request.login(userName: "admin", password: "admin") { response in
             switch response.result {
             case .success(let login):
-                print(login)
+                guard let user = login.user else {
+                    completion(.failure(NetworkError.response(message: login.errorMessage ?? "Unknown error")))
+                    return
+                }
+                completion(.success(user))
             case .failure(let error):
                 print(error.localizedDescription)
             }
         }
     }
     
-    func registerRequest() {
-        let register = requestFactory.makeRegisterRequestFactory()
-        register.register(
-            userId: 123,
-            userName: "Somebody",
-            password: "mypassword",
-            email: "some@some.ru",
-            gender: "m",
-            creditCard: "9872389-2424-234224-234",
-            bio: "This is good! I think I will switch to another language"
-        ) { response in
+    func registerRequest(completion: @escaping ((Result<String, NetworkError>) -> Void)) {
+        let request = requestFactory.makeRequestFactory()
+        request.register(username: "Somebody", password: "password", email: "some@some.ru", gender: "m", creditCard: "98723892424234224234", bio: "This is good! I think I will switch to another language") { response in
             switch response.result {
             case .success(let register):
-                print(register)
+                register.result == 1 ? completion(.success(register.userMessage ?? String())) : completion(.failure(NetworkError.response(message: register.errorMessage ?? "Unknown error")))
             case .failure(let error):
                 print(error.localizedDescription)
             }
         }
     }
     
-    func changeUserDataRequest() {
-        let change = requestFactory.makeChangeUserDataRequestFactory()
-        change.change(
-            userId: 123,
-            userName: "Geekbrains",
-            password: "password",
-            email: "geekbrains@gb.ru",
-            gender: "m",
-            creditCard: "9872389-2424-234224-234",
-            bio: "This is good! I think I will switch to another language"
-        ) { response in
+    func changeUserDataRequest(completion: @escaping ((Result<String, NetworkError>) -> Void)) {
+        let request = requestFactory.makeRequestFactory()
+        request.change(userId: 2, username: "Somebody", password: "password", email: "some@some.ru", gender: "m", creditCard: "98723892424234224234", bio: "This is good! I think I will switch to another language") { response in
             switch response.result {
             case .success(let change):
-                print(change)
+                change.result == 1 ? completion(.success(change.userMessage ?? String())) : completion(.failure(NetworkError.response(message: change.errorMessage ?? "Unknown error")))
             case .failure(let error):
                 print(error.localizedDescription)
             }
@@ -79,35 +100,43 @@ class ViewController: UIViewController {
     }
     
     func logoutRequest() {
-        let logout = requestFactory.makeLogoutRequestFactory()
-        logout.logout(userId: 123) { response in
+        let request = requestFactory.makeRequestFactory()
+        request.logout(userId: 123) { response in
             switch response.result {
             case .success(let logout):
-                print(logout)
+                logout.result == 1 ? print("Logged out") :  print("Unknown error")
             case .failure(let error):
                 print(error.localizedDescription)
             }
         }
     }
     
-    func getCatalog(completion: @escaping ([CatalogProduct]) -> Void) {
+    func getCatalog(completion: @escaping ((Result<[Product], NetworkError>) -> Void)) {
         let catalog = requestFactory.makeCatalogRequestFactory()
-        catalog.catalog(pageNumber: 1, categoryId: 1) { response in
+        catalog.catalog(pageNumber: 0, categoryId: 0) { response in
             switch response.result {
-            case .success(let products):
-                completion(products)
+            case .success(let catalog):
+                guard let products = catalog.products else {
+                    completion(.failure(NetworkError.response(message: catalog.errorMessage ?? "Unknown error")))
+                    return
+                }
+                completion(.success(products))
             case .failure(let error):
                 print(error.localizedDescription)
             }
         }
     }
     
-    func getProduct(by productId: Int, completion: @escaping (Product) -> Void) {
+    func getProduct(by productId: Int, completion: (@escaping (Result<Product, NetworkError>) -> Void)) {
         let productRequest = requestFactory.makeProductRequestFactory()
         productRequest.product(productId: productId) { response in
             switch response.result {
-            case .success(let product):
-                completion(product)
+            case .success(let item):
+                guard let product = item.product else {
+                    completion(.failure(NetworkError.response(message: "No products")))
+                    return
+                }
+                completion(.success(product))
             case .failure(let error):
                 print(error.localizedDescription)
             }

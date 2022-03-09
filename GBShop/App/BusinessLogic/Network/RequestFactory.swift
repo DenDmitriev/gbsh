@@ -24,7 +24,12 @@ class RequestFactory {
     
     let sessionQueue = DispatchQueue.global(qos: .utility)
     
-    func makeAuthRequestFatory() -> AuthRequestFactory {
+    func makeRequestFactory() -> UserRequestFactory {
+        let errorParser = makeErrorParser()
+        return UserRequest(errorParser: errorParser, sessionManager: commonSession, queue: sessionQueue)
+    }
+    
+    func makeAuthRequestFactory() -> AuthRequestFactory {
         let errorParser = makeErrorParser()
         return Auth(errorParser: errorParser, sessionManager: commonSession, queue: sessionQueue)
     }
