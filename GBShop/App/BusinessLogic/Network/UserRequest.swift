@@ -22,90 +22,6 @@ class UserRequest: AbstractRequestFactory {
         self.sessionManager = sessionManager
         self.queue = queue
     }
-    
-    enum Method {
-        case register(login: String, password: String, email: String, gender: String, creditCard: String, bio: String)
-        case authorisation(login: String, password: String)
-        case change(userId: Int, login: String, password: String, email: String, gender: String, creditCard: String, bio: String)
-        case logout(userId: Int)
-        
-        var path: String {
-            switch self {
-            case .register:
-                return "register"
-            case .authorisation:
-                return "authorization"
-            case .change:
-                return "change"
-            case .logout:
-                return "logout"
-            }
-        }
-        
-        var parameters: [String: String] {
-            switch self {
-            case .register(login: let login, password: let password, email: let email, gender: let gender, creditCard: let creditCard, bio: let bio) :
-                return [
-                    "username": login,
-                    "password": password,
-                    "email": email,
-                    "gender": gender,
-                    "creditCard": creditCard,
-                    "bio": bio
-                ]
-            case .authorisation(login: let login, password: let password):
-                return [
-                    "login": login,
-                    "password": password
-                ]
-            case .change(userId: let userId, login: let login, password: let password, email: let email, gender: let gender, creditCard: let creditCard, bio: let bio):
-                return [
-                    "userId": String(userId),
-                    "username": login,
-                    "password": password,
-                    "email": email,
-                    "gender": gender,
-                    "creditCard": creditCard,
-                    "bio": bio
-                ]
-            case .logout(userId: let userId):
-                return [
-                    "userId": String(userId)
-                ]
-            }
-        }
-    }
-}
-
-extension UserRequest: UserRequestFactory {
-    
-    func login(userName: String, password: String, completionHandler: @escaping (AFDataResponse<LoginResult>) -> Void) {
-        let method = Method.authorisation(login: userName, password: password)
-        let requestModel = Request(baseUrl: baseUrl, method: .post, path: method.path, parameters: method.parameters)
-        print(requestModel.fullUrl)
-        self.request(request: requestModel, completionHandler: completionHandler)
-    }
-    
-    func change(userId: Int, username: String, password: String, email: String, gender: String, creditCard: String, bio: String, completionHandler: @escaping (AFDataResponse<ChangeResult>) -> Void) {
-        let method = Method.change(userId: userId, login: username, password: password, email: email, gender: gender, creditCard: creditCard, bio: bio)
-        let requestModel = Request(baseUrl: baseUrl, method: .post, path: method.path, parameters: method.parameters)
-        print(requestModel.fullUrl)
-        self.request(request: requestModel, completionHandler: completionHandler)
-    }
-    
-    func logout(userId: Int, completionHandler: @escaping (AFDataResponse<LogoutResult>) -> Void) {
-        let method = Method.logout(userId: userId)
-        let requestModel = Request(baseUrl: baseUrl, method: .post, path: method.path, parameters: method.parameters)
-        print(requestModel.fullUrl)
-        self.request(request: requestModel, completionHandler: completionHandler)
-    }
-    
-    func register(username: String, password: String, email: String, gender: String, creditCard: String, bio: String, completionHandler: @escaping (AFDataResponse<RegisterResult>) -> Void) {
-        let method = Method.register(login: username, password: password, email: email, gender: gender, creditCard: creditCard, bio: bio)
-        let requestModel = Request(baseUrl: baseUrl, method: .post, path: method.path, parameters: method.parameters)
-        print(requestModel.fullUrl)
-        self.request(request: requestModel, completionHandler: completionHandler)
-    }
 }
 
 extension UserRequest {
@@ -115,5 +31,66 @@ extension UserRequest {
         var method: HTTPMethod
         var path: String
         var parameters: Parameters?
+    }
+    
+    private func createRequest<T: Decodable>(_ method: RequestMethod, _ completionHandler: @escaping (AFDataResponse<T>) -> Void) {
+        let requestModel = Request(baseUrl: baseUrl, method: .post, path: method.path, parameters: method.parameters)
+        print(requestModel.fullUrl)
+        self.request(request: requestModel, completionHandler: completionHandler)
+    }
+}
+
+extension UserRequest: UserRequestFactory {
+    
+    //MARK: - User data requests
+    
+    func login(userName: String, password: String, completionHandler: @escaping (AFDataResponse<LoginResult>) -> Void) {
+        let method = RequestMethod.authorisation(login: userName, password: password)
+        createRequest(method, completionHandler)
+    }
+    
+    func change(userId: Int, username: String, password: String, email: String, gender: String, creditCard: String, bio: String, completionHandler: @escaping (AFDataResponse<ChangeResult>) -> Void) {
+        let method = RequestMethod.change(userId: userId, login: username, password: password, email: email, gender: gender, creditCard: creditCard, bio: bio)
+        createRequest(method, completionHandler)
+    }
+    
+    func logout(userId: Int, completionHandler: @escaping (AFDataResponse<LogoutResult>) -> Void) {
+        let method = RequestMethod.logout(userId: userId)
+        createRequest(method, completionHandler)
+    }
+    
+    func register(username: String, password: String, email: String, gender: String, creditCard: String, bio: String, completionHandler: @escaping (AFDataResponse<RegisterResult>) -> Void) {
+        let method = RequestMethod.register(login: username, password: password, email: email, gender: gender, creditCard: creditCard, bio: bio)
+        createRequest(method, completionHandler)
+    }
+    
+    //MARK: - Products requests
+    
+    func catalog(pageNumber: Int, categoryId: Int, completionHandler: @escaping (AFDataResponse<CatalogResult>) -> Void) {
+        let method = RequestMethod.catalog(pageNumber: pageNumber, categoryId: categoryId)
+        createRequest(method, completionHandler)
+    }
+    
+    func product(productId: Int, completionHandler: @escaping (AFDataResponse<ProductResult>) -> Void) {
+        let method = RequestMethod.product(id: productId)
+        createRequest(method, completionHandler)
+    }
+    
+    
+    //MARK: - Reviews requests
+    
+    func getReviews(productId: Int, completionHandler: @escaping (AFDataResponse<ReviewsResult>) -> Void) {
+        let method = RequestMethod.getReviews(productId: productId)
+        createRequest(method, completionHandler)
+    }
+    
+    func addReview(productId: Int, completionHandler: @escaping (AFDataResponse<AddReviewResult>) -> Void) {
+        let method = RequestMethod.addReview(productId: productId)
+        createRequest(method, completionHandler)
+    }
+    
+    func deleteReview(reviewId: Int, completionHandler: @escaping (AFDataResponse<DeleteReviewResult>) -> Void) {
+        let method = RequestMethod.deleteReview(reviewId: reviewId)
+        createRequest(method, completionHandler)
     }
 }

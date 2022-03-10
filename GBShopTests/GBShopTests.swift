@@ -25,7 +25,7 @@ class GBShopTests: XCTestCase {
     }
     
     func testAuth() throws {
-        let auth = requestFactory.makeAuthRequestFactory()
+        let auth = requestFactory.makeRequestFactory()
         
         auth.login(userName: "Somebody", password: "mypassword") { response in
             switch response.result {
@@ -41,7 +41,7 @@ class GBShopTests: XCTestCase {
     }
     
     func testRegister() throws {
-        let register = requestFactory.makeRegisterRequestFactory()
+        let register = requestFactory.makeRequestFactory()
         register.register(
             username: "Somebody",
             password: "mypassword",
@@ -63,7 +63,7 @@ class GBShopTests: XCTestCase {
     }
     
     func testChangeUserData() throws {
-        let change = requestFactory.makeChangeUserDataRequestFactory()
+        let change = requestFactory.makeRequestFactory()
         
         change.change(userId: 2, username: "Geekbrains", password: "password", email: "geekbrains@gb.ru", gender: "m", creditCard: "9872389-2424-234224-234", bio: "This is good! I think I will switch to another language") { response in
             switch response.result {
@@ -79,7 +79,7 @@ class GBShopTests: XCTestCase {
     }
     
     func testLogout() throws {
-        let logout = requestFactory.makeLogoutRequestFactory()
+        let logout = requestFactory.makeRequestFactory()
         logout.logout(userId: 123) { response in
             switch response.result {
             case .success(let logout):
@@ -94,7 +94,7 @@ class GBShopTests: XCTestCase {
     }
     
     func testCatalogRequest() throws {
-        let catalog = requestFactory.makeCatalogRequestFactory()
+        let catalog = requestFactory.makeRequestFactory()
         catalog.catalog(pageNumber: 1, categoryId: 1) { response in
             switch response.result {
             case .success(let catalog):
@@ -109,7 +109,7 @@ class GBShopTests: XCTestCase {
     }
     
     func testProductRequest() throws {
-        let productRequest = requestFactory.makeProductRequestFactory()
+        let productRequest = requestFactory.makeRequestFactory()
         productRequest.product(productId: 123) { response in
             switch response.result {
             case .success(let product):
