@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "BABEE952-A4B0-447E-B4C9-6FD1CB649E8B",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:GBShop.xcodeproj",
+        "identifier" : "95E3C8A827BA27B500DEF307",
+        "name" : "GBShopUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

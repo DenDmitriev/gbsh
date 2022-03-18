@@ -18,6 +18,12 @@ class ViewController: UIViewController {
         registerRequest()
         changeUserDataRequest()
         logoutRequest()
+        getCatalog { products in
+            print(products)
+        }
+        getProduct(by: 123) { product in
+            print(product)
+        }
     }
     
     func authRequest() {
@@ -84,8 +90,29 @@ class ViewController: UIViewController {
         }
     }
     
-        
-        
-
+    func getCatalog(completion: @escaping ([CatalogProduct]) -> Void) {
+        let catalog = requestFactory.makeCatalogRequestFactory()
+        catalog.catalog(pageNumber: 1, categoryId: 1) { response in
+            switch response.result {
+            case .success(let products):
+                completion(products)
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+        }
+    }
+    
+    func getProduct(by productId: Int, completion: @escaping (Product) -> Void) {
+        let productRequest = requestFactory.makeProductRequestFactory()
+        productRequest.product(productId: productId) { response in
+            switch response.result {
+            case .success(let product):
+                completion(product)
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+        }
+    }
+    
 }
 
